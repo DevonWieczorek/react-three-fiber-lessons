@@ -1,0 +1,47 @@
+# Linting & testing & build artifacts
+coverage/
+artifacts/
+dist/
+
+# Turborepo cache
+.turbo/
+
+# Deployment tooling
+.env
+
+.DS_Store
+node_modules
+package-lock.json
+__builds
+dist-dev
+dist-prod
+**/*.sql
+**/*:Zone.Identifier
+*.log
+
+# These locale files must never be commited to the repo
+**/i18n/locales.json
+
+# yarn v2
+yarn-error.log
+yarn-debug.log
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+package-prerelease-backup.json
+*.code-workspace
+secrets
+**/test-output/
+
+# Storybook
+storybook-static
+temp
+release.json
+notification.json
+
+# Bower dependency directory (https://bower.io/)
+**/bower_components
+
+**/mine.crt
+**/mine.key
