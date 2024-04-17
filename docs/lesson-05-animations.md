@@ -32,3 +32,173 @@ const tick = () =>
 }
 
 ```
+That's it. You have your infinite loop.
+
+As you can see on the console, the 'tick' is being called on each frame. If you test this code on a computer with a high frame rate, the 'tick' will appears at a higher frequency.
+
+You can now move the `renderer.render(...)` call inside that function and increase the cube `rotation`:
+
+```js
+/**
+ * Animate
+ */
+const tick = () =>
+{
+    // Update objects
+    mesh.rotation.y += 0.01
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
+
+tick()
+```
+
+Congratulations, you now have a Three.js animation.
+
+The problem is, if you test this code on a computer with high frame rate, the cube will rotate faster, and if you test on a lower frame rate, the cube will rotate slower.
+
+## Adaptation to the Framerate
+
+To adapt the animation to the framerate, we need to know how much time it's been since the last tick.
+
+First, we need a way to measure time. In native JavaScript, you can use `Date.now()` to get the current timestamp:
+
+```js
+const time = Date.now()
+```
+
+The timestamp corresponds to how much time has passed since the 1st of January 1970 (the beginning of time for Unix). In JavaScript, its unit is in milliseconds.
+
+What you need now is to subtract the current timestamp to that of the previous frame to get what we can call the `deltaTime` and use this value when animating objects:
+
+```js
+/**
+ * Animate
+ */
+let time = Date.now()
+
+const tick = () =>
+{
+		// Time
+    const currentTime = Date.now()
+    const deltaTime = currentTime - time
+    time = currentTime
+
+    // Update objects
+    mesh.rotation.y += 0.01 * deltaTime
+
+    // ...
+}
+```
+
+The cube should rotate faster because the deltaTime should be around `16` if your screen is running at `60fps`, so feel free to reduce it by multiplying the value.
+
+Now that we base our rotation on how much time was spent since the last frame, this rotation speed will be the same on every screen and every computers regardless of the frame rate.
+
+## Using Clock
+
+While this code isn't that complicated, there is a built-in solution in Three.js named Clock that will handle the time calculations.
+
+You simply have to instantiate a Clock variable and use the built-in methods like `getElapsedTime()`. This method will return how many seconds have passed since the Clock was created.
+
+You can use this value to rotate the object:
+
+```js
+/**
+ * Animate
+ */
+const clock = new THREE.Clock()
+
+const tick = () =>
+{
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update objects
+    mesh.rotation.y = elapsedTime
+
+    // ...
+}
+
+tick()
+```
+
+You can also use it to move things with the `position` property. If you combine it with `Math.sin(...)` you can get a pretty good result:
+
+```js
+/**
+ * Animate
+ */
+const clock = new THREE.Clock()
+
+const tick = () =>
+{
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update objects
+    mesh.position.x = Math.cos(elapsedTime)
+    mesh.position.y = Math.sin(elapsedTime)
+
+    // ...
+}
+
+tick()
+```
+
+And obviously, you can use those techniques to animate any Object3D like the camera:
+
+```js
+/**
+ * Animate
+ */
+const clock = new THREE.Clock()
+
+const tick = () =>
+{
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update objects
+    camera.position.x = Math.cos(elapsedTime)
+    camera.position.y = Math.sin(elapsedTime)
+    camera.lookAt(mesh.position)
+
+    // ...
+}
+
+tick()
+```
+
+Another available method is `getDelta(...)`, but you should not use it unless you know exactly what's going on in the Clock class code. Using it might mess with your animation, and you'll get unwanted results.
+
+## Using a Library
+
+Sometimes you'll want to animate your scene in a very specific way that will require using another library. There are tons of animation libraries, but a very famous one is GSAP.
+
+There are many ways of using GSAP, and we could dedicate an entire course to it, but it is not the goal of this course. We will simply create a tween to test things out. If you already know how to use GSAP, it works the same with Three.js.
+
+Comment the code related to the previous animations but keep the `tick` function with the render. Then you can create what we call a tween (an animation from A to B) using `gsap.to(...)`:
+
+```js
+/**
+ * Animate
+ */
+gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 })
+
+const tick = () =>
+{
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
+
+tick()
+```
+
+## Choosing the Right Solution
+
+As for choosing between native JS and an animation library, it's a matter of what you want to achieve. If you're going to create a carousel that spins forever, you don't need any library for that. But if you want to animate, for instance, the swing of a sword, you might prefer to use a library.

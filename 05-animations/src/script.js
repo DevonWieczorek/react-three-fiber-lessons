@@ -32,17 +32,19 @@ renderer.setSize(sizes.width, sizes.height)
 
 
 // Animations
-const clock = new THREE.Clock();
+// const clock = new THREE.Clock();
+gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 });
+gsap.to(mesh.position, { duration: 1, delay: 2, x: 0 });
 
 const tick = () => {
 
-    // Time
-    const elapsedTime = clock.getElapsedTime();
+    // // Time
+    // const elapsedTime = clock.getElapsedTime();
 
-    // Update objects
-    mesh.rotation.y = elapsedTime;
-    mesh.position.x = Math.cos(elapsedTime);
-    mesh.position.y = Math.sin(elapsedTime);
+    // // Update objects
+    // mesh.rotation.y = elapsedTime;
+    // mesh.position.x = Math.cos(elapsedTime);
+    // mesh.position.y = Math.sin(elapsedTime);
     
     // Re-render the scene
     renderer.render(scene, camera)
